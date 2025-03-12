@@ -9,3 +9,12 @@ body {
   font-family: "Montserrat", sans-serif;
 
 }
+
+/* for blue arrow button on homepage bc it spins too fast and tailwind can't do anything about it */
+.animatedButton {
+  animation-duration: 10000ms;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Image from "./Image";
 import { Link } from "react-router-dom";
+import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 
 const Navbar = () => {
 
@@ -47,9 +48,18 @@ const Navbar = () => {
         <Link to="/">Trending</Link>
         <Link to="/">Most Popular</Link>
         <Link to="/">About</Link>
-        <Link to="/">
-          <button className="py-2 px-4 rounded-3xl bg-blue-800 text-white">Login 👋</button>
-        </Link>
+        
+        {/* components that show up when you are signed out */}
+        <SignedOut>
+          <Link to="/login">
+            <button className="py-2 px-4 rounded-3xl bg-blue-800 text-white">Login 👋</button>
+          </Link>
+        </SignedOut>
+
+        {/* components that show up when you are signed in */}
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
       </div>
     </div>
   )

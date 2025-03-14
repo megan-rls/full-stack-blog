@@ -18,3 +18,16 @@ body {
 ::-webkit-scrollbar {
   display: none;
 }
+
+/* for quill text editor container so that there are no borders */
+.ql-container{
+  border: none !important;
+}
+
+.ql-toolbar{
+  border: none !important;
+}
+
+.ql-editor{
+  border: none !important;
+}

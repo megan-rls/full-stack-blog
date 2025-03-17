@@ -5,6 +5,8 @@ import ReactQuill from "react-quill-new";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useAuth } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Write = () => {
 
@@ -13,6 +15,8 @@ const Write = () => {
 
   // use with quill later once i fix the double toolbar
   const [value, setValue] = useState('');
+
+  const navigate = useNavigate();
 
   const {getToken} = useAuth();
 
@@ -25,6 +29,11 @@ const Write = () => {
         },
       });
     },
+    // if post creation is successful, navigate to that post page
+    onSuccess:(res)=>{
+      toast.success("Post has been created!")
+      navigate(`/${res.data.slug}`)
+    }
   });
 
   if(!isLoaded) {
@@ -93,7 +102,13 @@ const Write = () => {
           value={value}
           onChange={setValue}
         /> */}
-        <button className="bg-blue-800 text-white font-medium rounded-xl mt-4 p-2 w-36">Send</button>
+        <button
+          disabled={mutation.isPending}
+          className="bg-blue-800 text-white font-medium rounded-xl mt-4 p-2 w-36 disabled:bg-blue-400 disabled:cursor-not-allowed"
+        >
+          {mutation.isPending ? "Loading..." : "Send"}
+        </button>
+        {mutation.isError && <span>{mutation.error.message}</span>}
       </form>
     </div>
   )

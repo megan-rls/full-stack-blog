@@ -5,6 +5,8 @@ import postRouter from "./routes/post.route.js";
 import commentRouter from "./routes/comment.route.js";
 import webhookRouter from "./routes/webhook.route.js";
 import { clerkMiddleware, requireAuth } from '@clerk/express'; // checks request's cookies and headers for a session jwt (if you are logged in as a user --> you can create/update/delete blog posts)
+import cors from "cors";
+
 
 // enable env variables
 import { config } from 'dotenv';
@@ -12,6 +14,9 @@ config()
 
 
 const app = express();
+
+app.use(cors(process.env.CLIENT_URL)); // allows localhost 5173 to access
+
 app.use(clerkMiddleware());
 app.use("/webhooks", webhookRouter); // this does not use express, so put this line before app.use(express())
 

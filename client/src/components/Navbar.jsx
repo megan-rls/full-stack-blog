@@ -1,11 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "./Image";
 import { Link } from "react-router-dom";
-import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, UserButton, useAuth } from "@clerk/clerk-react";
+import { use } from "react";
 
 const Navbar = () => {
 
   const [open, setOpen] = useState(false)
+  
+  // // just wanted to get token from console log lol
+  // const {getToken} = useAuth();
+  // useEffect(() => {
+  //   getToken().then((token) => console.log(token));
+  // }, []);
 
   const handleClick = () => {
     setOpen((prev) => !prev)

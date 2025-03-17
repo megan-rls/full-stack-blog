@@ -1,9 +1,10 @@
-import express from "express"
-import connectDB from "./lib/connectDB.js"
-import userRouter from "./routes/user.route.js"
-import postRouter from "./routes/post.route.js"
-import commentRouter from "./routes/comment.route.js"
-import webhookRouter from "./routes/webhook.route.js"
+import express from "express";
+import connectDB from "./lib/connectDB.js";
+import userRouter from "./routes/user.route.js";
+import postRouter from "./routes/post.route.js";
+import commentRouter from "./routes/comment.route.js";
+import webhookRouter from "./routes/webhook.route.js";
+import { clerkMiddleware, requireAuth } from '@clerk/express'; // checks request's cookies and headers for a session jwt (if you are logged in as a user --> you can create/update/delete blog posts)
 
 // enable env variables
 import { config } from 'dotenv';
@@ -11,9 +12,31 @@ config()
 
 
 const app = express();
+app.use(clerkMiddleware());
 app.use("/webhooks", webhookRouter); // this does not use express, so put this line before app.use(express())
 
 app.use(express.json()); // middleware func that allows us to send json files
+
+// // clerk middleware, check if auth
+// app.get("/auth-state", (req,res) => {
+//   const authState = req.auth;
+//   res.json(authState);
+// })
+
+// // clerk middleware, check if auth
+// app.get("/protect", (req,res) => {
+//   const {userId} = req.auth;
+//   if (!userId){
+//     return res.status(401).json("not authenticated rip")
+//   }
+//   res.status(200).json("you are authenticated")
+// })
+
+// // clerk middleware, check if auth
+// app.get("/protect2", requireAuth(), (req,res) => {
+//   res.status(200).json("you are authenticated")
+//   // returns you to the home page if not authenticated
+// })
 
 app.use("/users", userRouter);
 app.use("/posts", postRouter);

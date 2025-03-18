@@ -31,3 +31,8 @@ body {
 .ql-editor{
   border: none !important;
 }
+
+/* a temp fix to double toolbar bug with quill */
+.quill > .ql-toolbar:first-child {
+  display: none !important;
+}

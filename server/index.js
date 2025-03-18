@@ -22,6 +22,15 @@ app.use("/webhooks", webhookRouter); // this does not use express, so put this l
 
 app.use(express.json()); // middleware func that allows us to send json files
 
+//imagekit to upload images to a post
+// allow cross-origin requests
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", 
+    "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 // // clerk middleware, check if auth
 // app.get("/auth-state", (req,res) => {
 //   const authState = req.auth;
@@ -60,8 +69,6 @@ app.use((error,req,res,next) => {
     stack:error.stack, // useful in dev for debugging
   });
 });
-
-
 
 app.listen(3000, () => {
   connectDB()

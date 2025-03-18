@@ -1,5 +1,10 @@
+import ImageKit from "imagekit";
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
+
+import dotenv from 'dotenv';
+dotenv.config();
+
 
 export const getPosts = async (req, res) => {
   const posts = await Post.find();
@@ -67,3 +72,37 @@ export const deletePost = async (req, res) => {
   res.status(200).json("post has been deleted");
 };
 
+// for uploading images to imagekit
+const imagekit = new ImageKit({
+  urlEndpoint: process.env.IK_URL_ENDPOINT,
+  publicKey: process.env.IK_PUBLIC_KEY,
+  privateKey: process.env.IK_PRIVATE_KEY,
+});
+
+// const imagekit = new ImageKit({
+//   urlEndpoint: 'https://ik.imagekit.io/meganl1e',
+//   publicKey: 'public_G1MAAB1KX+d2bdPT8gmK/7ZVxwE=',
+//   privateKey: 'private_OMLb/ViE2b2QO4fxpv4cIXdVz4E=',
+// });
+
+// export const uploadAuth = async (req, res) => {
+//   const result = imagekit.getAuthenticationParameters();
+//   console.log("result:" + result)
+//   res.send(result);
+// };
+
+export const uploadAuth = async (req, res) => {
+  try {
+    const result = imagekit.getAuthenticationParameters();
+    console.log('Authentication Parameters:', result);
+    
+    if (!result || !result.signature) {
+      throw new Error('Failed to generate authentication parameters.');
+    }
+    
+    res.json(result); // Use res.json() instead of res.send() for JSON data
+  } catch (error) {
+    console.error('Error generating authentication parameters:', error);
+    res.status(500).json({ message: 'Failed to generate authentication parameters.' });
+  }
+};

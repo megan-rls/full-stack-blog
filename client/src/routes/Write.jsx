@@ -7,6 +7,28 @@ import axios from "axios";
 import { useAuth } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { IKContext, IKUpload } from "imagekitio-react";
+
+// image kit authenticator thing to upload images
+// you have to be authenticated to upload images
+const authenticator = async () => {
+  try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/posts/upload-auth`);
+      // console.log(response)
+
+      if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Request failed with status ${response.status}: ${errorText}`);
+      }
+
+      // console.log(response.json())
+      const data = await response.json();
+      const { signature, expire, token } = data;
+      return { signature, expire, token };
+  } catch (error) {
+      throw new Error(`Authentication request failed: ${error.message}`);
+  }
+};
 
 const Write = () => {
 
@@ -58,13 +80,36 @@ const Write = () => {
     // console.log(data)
 
     mutation.mutate(data)
-  }
+  };
+
+  // for image kit
+  const onError = (err) => {
+    console.log(err);
+    toast.error("Image upload failed!");
+  };
+
+  const onSuccess = (res) => {
+    console.log(res);
+  };
 
   return (
     <div className='h-[calc(100vh-64px)] md:h-[calc(100vh-80px)] flex flex-col gap-6'>
       <h1 className="text-xl font-light">Create a new post</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-6 flex-1 mb-6">
-        <button className="w-max p-2 bg-white rounded-xl shadow-md text-sm text-gray-500">Add a cover image</button>
+        {/* <button className="w-max p-2 bg-white rounded-xl shadow-md text-sm text-gray-500">
+          Add a cover image
+        </button> */}
+        <IKContext
+          publicKey={import.meta.env.VITE_IK_PUBLIC_KEY}
+          urlEndpoint={import.meta.env.VITE_IK_URL_ENDPOINT}
+          authenticator={authenticator}
+        >
+          <IKUpload
+            useUniqueFileName
+            onError={onError}
+            onSuccess={onSuccess}
+          />
+        </IKContext>
         <input
           className="text-4xl font-semibold bg-transparent outline-none"
           type="text"
@@ -91,11 +136,19 @@ const Write = () => {
           name="desc"
           placeholder="A short description"
         />
-        <textarea
-          className="p-4 bg-white rounded-xl shadow-md"
-          name="content"
-          placeholder="replace with react quill one day"
-        />
+
+        <div className="flex">
+          <div className="flex flex-col gap-2 mr-2">
+            <div className="cursor-pointer">🖼️</div>
+            <div className="cursor-pointer">📽️</div>
+          </div>
+          <textarea
+            className="flex-1 p-4 bg-white rounded-xl shadow-md"
+            name="content"
+            placeholder="replace with react quill one day"
+          />
+        </div>
+
         {/* <ReactQuill
           theme="snow"
           className="flex-1 rounded-xl bg-white shadow-md"

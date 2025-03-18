@@ -3,10 +3,13 @@ import {
   getPosts, 
   getPost, 
   createPost,
-  deletePost 
+  deletePost,
+  uploadAuth,
 } from "../controllers/post.controller.js"
 
 const router = express.Router();
+
+router.get("/upload-auth", uploadAuth);
 
 // retrieves all posts
 router.get("/", getPosts);
@@ -15,9 +18,10 @@ router.get("/", getPosts);
 router.get("/:slug", getPost);
 
 // create a post
-router.post("/", createPost)
+router.post("/", createPost);
 
 // delete a post
-router.delete("/:id", deletePost)
+router.delete("/:id", deletePost);
+
 
 export default router

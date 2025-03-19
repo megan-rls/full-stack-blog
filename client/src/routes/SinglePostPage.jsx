@@ -15,6 +15,8 @@ const fetchPost = async(slug) => {
   return res.data;
 };
 
+
+
 const SinglePostPage = () => {
 
   const {slug} = useParams();
@@ -95,7 +97,7 @@ const SinglePostPage = () => {
             </div>
           </div>
           {/* save and delete post actions */}
-          <PostMenuActions />
+          <PostMenuActions post={data} />
 
           {/* categories */}
           <h1 className="mt-8 mb-4 text-sm font-medium">Categories</h1>

@@ -65,19 +65,22 @@ export const createPost = async (req, res) => {
 };
 
 export const deletePost = async (req, res) => {
-
   const clerkUserId = req.auth.userId;
   if (!clerkUserId) {
-    return res.status(401).json("not authenticated")
+    return res.status(401).json("not authenticated");
   }
 
   const user = await User.findOne({ clerkUserId });
 
+  if (!user) {
+    return res.status(404).json("user not found");
+  }
+
   // find post that is yours (you cannot delete other people's posts)
-  const deletedPost = await Post.findOneAndDelete({ 
+  const deletedPost = await Post.findOneAndDelete({
     _id: req.params.id,
-    user:user._id
-  })
+    user: user._id, // Ensure the user ID matches
+  });
 
   if (!deletedPost) {
     return res.status(403).json("you cannot delete this post bc it's not your post")
@@ -92,18 +95,6 @@ const imagekit = new ImageKit({
   publicKey: process.env.IK_PUBLIC_KEY,
   privateKey: process.env.IK_PRIVATE_KEY,
 });
-
-// const imagekit = new ImageKit({
-//   urlEndpoint: 'https://ik.imagekit.io/meganl1e',
-//   publicKey: 'public_G1MAAB1KX+d2bdPT8gmK/7ZVxwE=',
-//   privateKey: 'private_OMLb/ViE2b2QO4fxpv4cIXdVz4E=',
-// });
-
-// export const uploadAuth = async (req, res) => {
-//   const result = imagekit.getAuthenticationParameters();
-//   console.log("result:" + result)
-//   res.send(result);
-// };
 
 export const uploadAuth = async (req, res) => {
   try {

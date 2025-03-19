@@ -20,7 +20,7 @@ const userSchema = new Schema({
   img: {
     type: String,
   },
-  savedArray: {
+  savedPosts: {
     type: [String],
     default: [],
   },

@@ -3,8 +3,33 @@ import { Link } from "react-router-dom"
 import PostMenuActions from "../components/PostMenuActions"
 import Search from "../components/Search"
 import Comments from "../components/Comments"
+import { useQuery } from"@tanstack/react-query";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import { format } from "timeago.js";
+import parse from 'html-react-parser';
+
+
+const fetchPost = async(slug) => {
+  const res = await axios.get(`${import.meta.env.VITE_API_URL}/posts/${slug}`);
+  return res.data;
+};
 
 const SinglePostPage = () => {
+
+  const {slug} = useParams();
+
+  const {isPending, error, data} = useQuery({
+    queryKey:["post", slug],
+    queryFn: () => fetchPost(slug),
+  });
+
+  if (isPending) return "Loading...";
+  if (error) return "something went wrong..." + error.message;
+  if (!data) return "Post not found!";
+
+
+
   return (
     <div className='flex flex-col gap-8'>
       {/* post details */}
@@ -12,89 +37,38 @@ const SinglePostPage = () => {
         <div className="lg:w-3/5 flex flex-col">
           {/* title */}
           <h1 className="text-xl md:text-3xl xl:text-4xl exl:text-5xl font-semibold">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Est maiores facere corrupti atque?
+            {data.title}
           </h1>
 
           {/* author details */}
           <div className="flex items-center gap-2 text-gray-400 text-sm">
             <span>Written by</span>
-            <Link className="text-blue-500">John Doe</Link>
+            <Link className="text-blue-500">{data.user.username}</Link>
             <span>on</span>
-            <Link className="text-blue-500">Web Design</Link>
-            <span>2 days ago</span>
+            <Link className="text-blue-500">{data.category}</Link>
+            <span>{format(data.createdAt)}</span>
           </div>
           {/*  summary details */}
           <p className="text-gray-500 font-medium">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            Voluptates perspiciatis temporibus voluptatibus, impedit 
-            sapiente vel officia, aliquam quas fugit sunt delectus. Cum, nisi
-             adipisci quae maiores sint nihil facere praesentium.
+            {data.desc}
           </p>
         </div>
 
         {/* image */}
-        <div className="hidden lg:block w-2/5">
+        {data.img && <div className="hidden lg:block w-2/5">
           <Image
-            src="postImg.jpeg"
+            src={data.img}
             w="600"
             className="rounded-2xl"
           />
-        </div>
+        </div>}
       </div>
 
       {/* content */}
       <div className="flex flex-col md:flex-row gap-8">
         {/* text */}
         <div className="lg:text-lg flex flex-col gap-6 text-justify">
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere molestias sit dolores,
-            assumenda iste perspiciatis natus consectetur velit in ab, laboriosam optio
-            ex necessitatibus doloribus corrupti provident ullam totam odio? Lorem ipsum dolor sit amet consectetur
-            adipisicing elit. Repellat delectus blanditiis et magnam, ipsam possimus? Nulla minus
-            facilis repellendus aut inventore quia ipsam, non ut, ipsum quos eum, quisquam facere?
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere molestias sit dolores,
-            assumenda iste perspiciatis natus consectetur velit in ab, laboriosam optio
-            ex necessitatibus doloribus corrupti provident ullam totam odio? Lorem ipsum dolor sit amet consectetur
-            adipisicing elit. Repellat delectus blanditiis et magnam, ipsam possimus? Nulla minus
-             facilis repellendus aut inventore quia ipsam, non ut, ipsum quos eum, quisquam facere?
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere molestias sit dolores,
-            assumenda iste perspiciatis natus consectetur velit in ab, laboriosam optio
-            ex necessitatibus doloribus corrupti provident ullam totam odio? Lorem ipsum dolor sit amet consectetur
-            adipisicing elit. Repellat delectus blanditiis et magnam, ipsam possimus? Nulla minus
-             facilis repellendus aut inventore quia ipsam, non ut, ipsum quos eum, quisquam facere?
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere molestias sit dolores,
-            assumenda iste perspiciatis natus consectetur velit in ab, laboriosam optio
-            ex necessitatibus doloribus corrupti provident ullam totam odio? Lorem ipsum dolor sit amet consectetur
-            adipisicing elit. Repellat delectus blanditiis et magnam, ipsam possimus? Nulla minus
-             facilis repellendus aut inventore quia ipsam, non ut, ipsum quos eum, quisquam facere?
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere molestias sit dolores,
-            assumenda iste perspiciatis natus consectetur velit in ab, laboriosam optio
-            ex necessitatibus doloribus corrupti provident ullam totam odio? Lorem ipsum dolor sit amet consectetur
-            adipisicing elit. Repellat delectus blanditiis et magnam, ipsam possimus? Nulla minus
-             facilis repellendus aut inventore quia ipsam, non ut, ipsum quos eum, quisquam facere?
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere molestias sit dolores,
-            assumenda iste perspiciatis natus consectetur velit in ab, laboriosam optio
-            ex necessitatibus doloribus corrupti provident ullam totam odio? Lorem ipsum dolor sit amet consectetur
-            adipisicing elit. Repellat delectus blanditiis et magnam, ipsam possimus? Nulla minus
-             facilis repellendus aut inventore quia ipsam, non ut, ipsum quos eum, quisquam facere?
-          </p>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere molestias sit dolores,
-            assumenda iste perspiciatis natus consectetur velit in ab, laboriosam optio
-            ex necessitatibus doloribus corrupti provident ullam totam odio? Lorem ipsum dolor sit amet consectetur
-            adipisicing elit. Repellat delectus blanditiis et magnam, ipsam possimus? Nulla minus
-             facilis repellendus aut inventore quia ipsam, non ut, ipsum quos eum, quisquam facere?
-          </p>
+          {parse(data.content)}
         </div>
 
         {/* menu */}
@@ -102,13 +76,13 @@ const SinglePostPage = () => {
           <h1 className="mb-4 text-sm font-medium">Author</h1>
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-12">
-              <Image
-                src="userImg.jpeg"
+              {data.user.img && <Image
+                src={data.user.img}
                 className="w-12 h-12 rounded-full object-cover"
                 w="48"
                 h="48" 
-              />
-              <Link className="text-blue-800">John Doe</Link>
+              />}
+              <Link className="text-blue-800">{data.user.username}</Link>
             </div>
             <p className="text-sm text-gray-500">Lorem ipsum dolor sit amet consectetur</p>
             <div className="flex gap-2">
@@ -137,7 +111,7 @@ const SinglePostPage = () => {
           <Search />
         </div>
       </div>
-      <Comments />
+      <Comments postId={data._id}/>
     </div>
   )
 }

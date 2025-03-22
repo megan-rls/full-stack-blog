@@ -15,7 +15,12 @@ config()
 
 const app = express();
 
-app.use(cors(process.env.CLIENT_URL)); // allows localhost 5173 to access
+const PORT = process.env.PORT || 3000; // Use Render's dynamic port or fallback to 3000
+
+app.use(cors({
+  origin: process.env.CLIENT_URL, // Use CLIENT_URL from environment variables
+  credentials: true, // Allow cookies and credentials
+}));
 
 app.use(clerkMiddleware());
 app.use("/webhooks", webhookRouter); // this does not use express, so put this line before app.use(express())
@@ -30,27 +35,6 @@ app.use(function(req, res, next) {
     "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
-
-// // clerk middleware, check if auth
-// app.get("/auth-state", (req,res) => {
-//   const authState = req.auth;
-//   res.json(authState);
-// })
-
-// // clerk middleware, check if auth
-// app.get("/protect", (req,res) => {
-//   const {userId} = req.auth;
-//   if (!userId){
-//     return res.status(401).json("not authenticated rip")
-//   }
-//   res.status(200).json("you are authenticated")
-// })
-
-// // clerk middleware, check if auth
-// app.get("/protect2", requireAuth(), (req,res) => {
-//   res.status(200).json("you are authenticated")
-//   // returns you to the home page if not authenticated
-// })
 
 app.use("/users", userRouter);
 app.use("/posts", postRouter);
@@ -70,7 +54,7 @@ app.use((error,req,res,next) => {
   });
 });
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
   connectDB()
   console.log("server is running")
 })

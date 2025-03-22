@@ -18,7 +18,14 @@ const app = express();
 const PORT = process.env.PORT || 3000; // Use Render's dynamic port or fallback to 3000
 
 app.use(cors({
-  origin: process.env.CLIENT_URL, // Use CLIENT_URL from environment variables
+  origin: (origin, callback) => {
+    const allowedOrigins = [process.env.CLIENT_URL]; // Add allowed origins here
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true, // Allow cookies and credentials
 }));
 
@@ -26,15 +33,6 @@ app.use(clerkMiddleware());
 app.use("/webhooks", webhookRouter); // this does not use express, so put this line before app.use(express())
 
 app.use(express.json()); // middleware func that allows us to send json files
-
-//imagekit to upload images to a post
-// allow cross-origin requests
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", 
-    "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
 
 app.use("/users", userRouter);
 app.use("/posts", postRouter);
